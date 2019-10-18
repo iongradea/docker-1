@@ -1,0 +1,3 @@
+docker network create -d overlay overmind
+OR 
+docker network create -d overlay --attachable overmind
