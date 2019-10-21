@@ -1,1 +1,7 @@
-docker run -d --name=spawning-pool --restart=always -e MYSQL_DATABASE=zerglings -e MYSQL_ROOT_PASSWORD=Kerrigan -v hatchery:/var/lib/mysql mysql
+docker run --restart=always -d \
+	--name spawning-pool -e MYSQL_ROOT_PASSWORD=Kerrigan \
+	-e MYSQL_DATABASE=zerglings \
+	-v hatchery:/var/lib/mysql mysql:5.7
+
+# Link: 
+# - https://stackoverflow.com/questions/50097032/docker-compose-the-server-requested-authentication-method-unknown-to-the-clien/53580056#53580056
