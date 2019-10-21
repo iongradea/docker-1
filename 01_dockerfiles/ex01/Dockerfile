@@ -1,25 +1,30 @@
+# Pour build :
+# docker build -t <name> .
+# Pour run :
+# docker run  -d --publish=9987:9987/udp --publish=30033:30033/tcp --publish=10011:10011/tcp --name teamcontainer <name>
+# utiliser teamspeak from msc on 42 mac
+
+
 FROM debian
 
-ENV TS3SERVER_LICENSE=accept
+ADD http://dl.4players.de/ts/releases/3.0.13.6/teamspeak3-server_linux_amd64-3.0.13.6.tar.bz2 ./
 
+RUN export DEBIAN_FRONTEND=noninteractive \
+  && apt-get update \
+  && apt-get upgrade -y\
+  && apt-get install -y apt-utils bzip2 \
+  && tar xjf teamspeak3-server_linux_amd64-3.0.13.6.tar.bz2 \
+  && rm teamspeak3-server_linux_amd64-3.0.13.6.tar.bz2 \
+  && mv teamspeak3-server_linux_amd64 /opt/teamspeak
+
+RUN useradd teamspeak && mkdir -p /opt/teamspeak/data && chown teamspeak:teamspeak /opt/teamspeak/data
+VOLUME ["/opt/teamspeak/data"]
+
+EXPOSE 9987/udp
+EXPOSE 30033
+EXPOSE 10011
 WORKDIR /opt/teamspeak
+USER teamspeak
 
-RUN apt-get update && apt-get -y upgrade && apt-get install -y wget bzip2
-
-RUN wget http://dl.4players.de/ts/releases/3.6.1/teamspeak3-server_linux_amd64-3.6.1.tar.bz2
-RUN	tar -jxvf teamspeak3-server_linux_amd64-3.6.1.tar.bz2
-
-WORKDIR /opt/teamspeak/teamspeak3-server_linux_amd64/
-
-EXPOSE 9987/udp 10011 30033
-
-ENTRYPOINT ["sh", "ts3server_minimal_runscript.sh", "createinifile=1"]
-
-# build the image from the dockerfile
-# docker build -t <name> .
-
-# run the image created with appropriate flags, especially ports here
-# docker run -it --rm -p 9987:9987/udp -p 30033:30033 -p 10011:10011 <name>
-
-# launch Teamspeak client installed via ths MSC
-# connect with the address of the docker-machine
+#serveur qui se lancera au démarrage de votre container
+CMD /opt/teamspeak/ts3server_minimal_runscript.sh start
